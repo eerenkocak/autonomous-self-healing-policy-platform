@@ -1,0 +1,30 @@
+services:
+  critical-api:
+    image: nginx:1.27-alpine
+    container_name: critical-payment-api
+    ports:
+      - "8085:80"
+    mem_limit: 128m
+    networks:
+      - sre-platform-net
+
+  sre-remediator:
+    build: ./remediator
+    container_name: autonomous-sre-remediator
+    restart: unless-stopped
+    environment:
+      - TARGET_URL=http://critical-api:80
+      - TARGET_CONTAINER=critical-payment-api
+      - CHECK_INTERVAL=5
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./incidents:/app/incidents
+    depends_on:
+      - critical-api
+    mem_limit: 128m
+    networks:
+      - sre-platform-net
+
+networks:
+  sre-platform-net:
+    driver: bridge

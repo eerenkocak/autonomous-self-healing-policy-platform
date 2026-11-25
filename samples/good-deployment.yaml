@@ -1,0 +1,15 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: compliant-secure-app
+spec:
+  template:
+    spec:
+      containers:
+        - name: hardened-api
+          image: nginx:1.27-alpine
+          securityContext:
+            runAsNonRoot: true
+          resources:
+            limits:
+              memory: "256Mi"
